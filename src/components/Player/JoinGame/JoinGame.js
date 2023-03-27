@@ -75,16 +75,6 @@ export default class JoinGame extends Component {
     });
   };
 
-  handleClick = event => {
-    this.setState({
-      disabled: true
-    })
-
-    setTimeout(() => this.setState({
-      disabled: false
-    }), 500);
-  };
-
   handleSubmit = event => {
     event.preventDefault();
     const { nickname, pin } = this.state;

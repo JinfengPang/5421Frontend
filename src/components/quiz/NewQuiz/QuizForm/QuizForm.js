@@ -37,11 +37,11 @@ export default class QuizForm extends Component {
   saveQuiz = async () => {
     const { difficulty, total } = this.state;
     const postRequest = {
-      difficulty: difficulty,
-      total: total
+      quiz_type: difficulty,
+      quiz_count: total
     }
-    let res = await axios.post(URL('create-quiz'), postRequest);
-    const quizId = res.data._id;
+    let res = await axios.post(URL('quiz/generate_quiz'), postRequest);
+    let quizId = res.data.quiz_id
     this.props.history.push(`/quizzes/${ quizId }`);
   }
 

@@ -25,11 +25,11 @@ export default class ShowQuiz extends Component {
   componentDidMount() {
     const { quizId } = this.props.match.params;
     QuizInfo.getQuiz( quizId ).then(( { data } ) => {
-      const { _id, difficulty, total, questions } = data;
+      const { difficulty, questions } = data;
       this.setState({
-        id: _id,
+        id: quizId,
         difficulty: difficulty,
-        total: total,
+        total: questions.length,
         questions: questions
       })
     });

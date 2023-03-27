@@ -10,13 +10,13 @@ export default class AllQuizzes extends Component {
     this.state = {
       quizzes: [
           {
-            _id: 1,
+            id: 1,
             difficulty: 'easy',
             total: 10,
             questions: [{}, {}, {}]
           },
         {
-          _id: 2,
+          id: 2,
           difficulty: 'difficult',
           total: 10,
           questions: [{}, {}, {}]
@@ -97,8 +97,8 @@ const Index = (props) => {
   }
 
   const publicQuizzes = props.quizzes.map((q) => (
-    <Link to={`/quizzes/${ q._id }`}>
-      <div className={ styles.tile } key={ q._id }>
+    <Link to={`/quizzes/${ q.id }`}>
+      <div className={ styles.tile } key={ q.id }>
         <div>{ q.difficulty }</div>
         <div>{ q.total }</div>
         <div>{ q.questions.length } questions</div>
