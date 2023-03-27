@@ -11,6 +11,8 @@ import Instructions from './Player/Instructions/Instructions';
 import GetReady from './Player/GetReady/GetReady';
 import { Header } from './Global/Header';
 import { HashRouter, Switch, Route } from 'react-router-dom';
+import Login from './General/Login';
+import Register from './General/Register';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
       <Header />
       <HashRouter>
         <Switch>
+          <Route exact path='/register' component={ Register }/>
+          <Route exact path='/login' component={ Login }/>
           <Route exact path='/' component={ JoinGame }/>
           <Route exact path='/instructions' component={ Instructions }/>
           <Route exact path='/getready' component={ GetReady }/>
