@@ -93,45 +93,9 @@ export default class Register extends Component {
       pin: parseInt(pin)
     });
   };
-
-  componentDidMount() {
-    socket.on("USERNAME_TAKEN", () => {
-      this.setState({
-        message: "username taken"
-      })
-
-      setTimeout(() => this.setState({
-        message: null
-      }), 3000);
-    })
-
-    socket.on("PASSWORD_NOT_CORRECT", () => {
-      this.setState({
-        message: "Not correct"
-      })
-
-      setTimeout(() => this.setState({
-        message: null
-      }), 3000);
-
-    });
-
-    socket.on("PLAYER_LOGIN_SUCCESSFULLY", data => {
-      this.props.history.push(`/`)
-    })
-  }
-
   render() {
 
     let error;
-
-    if (this.state.message === null) {
-      error = null
-    } else if (this.state.message === "Not correct") {
-      error = <div className={ styles.error }><div>Password is not matched</div>Please check and try again.</div>
-    } else if (this.state.message === "username taken") {
-      error = <div className={ styles.error }>Sorry, that username is taken.</div>
-    }
 
     return (
       <div className={ styles.home }>
@@ -148,7 +112,7 @@ export default class Register extends Component {
           <div className={ styles.verticalMainForm }>
             <form onSubmit={ this.handleSubmit }>
               <JoinGameInput
-                placeholder="user id"
+                placeholder="user name"
                 name="nickname"
                 value={ this.state.nickname || '' }
                 onChange={ this.handleChange }
@@ -182,7 +146,7 @@ export default class Register extends Component {
                   fullWidth
                   className={ styles.enterBtn }
                 >
-                  Login
+                  Register
                 </Button>
               </MuiThemeProvider>
             </form>
@@ -191,8 +155,6 @@ export default class Register extends Component {
             { error }
           </div>
           <div style={{ textAlign: "center" }}>
-          <p className={ styles.hostQuiz } style={{ fontWeight: "bold" }}>Do not have an account yet?</p>
-            <p className={ styles.hostQuiz }><Link to="/quizzes" style={{ color: "white", textDecoration: "none", fontWeight: "bold" }}>Register</Link> a new account</p>     
           </div>
         </Grid>
       </div>
