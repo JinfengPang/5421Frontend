@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import styles from './QuizForm.module.scss';
 import axios from 'axios';
 import QuizDetailsForm from '../QuizDetailsForm/QuizDetailsForm';
-import QuestionsForm from '../QuestionsForm/QuestionsForm';
 import Confirm from '../Confirm/Confirm';
 import Grid from '@material-ui/core/Grid';
 
 let URL = (model) => {
-  return `https://quizy-server.herokuapp.com/${ model }/`
+  return `http://34.200.215.19:5000/api/${ model }/`
 };
 
 export default class QuizForm extends Component {
@@ -36,13 +35,12 @@ export default class QuizForm extends Component {
   }
 
   saveQuiz = async () => {
-    const { name, category, questions } = this.state;
+    const { difficulty, total } = this.state;
     const postRequest = {
-      name: name,
-      category: category,
-      questions: questions
+      difficulty: difficulty,
+      total: total
     }
-    let res = await axios.post(URL('quizzes'), postRequest);
+    let res = await axios.post(URL('create-quiz'), postRequest);
     const quizId = res.data._id;
     this.props.history.push(`/quizzes/${ quizId }`);
   }
@@ -53,22 +51,16 @@ export default class QuizForm extends Component {
     });
   };
 
-  handleNumberChange = difficulty => {
+  handleDifficultyChange = difficulty => {
     this.setState({
       difficulty: difficulty
-    });
-  };
-
-  saveQuestion = content => {
-    this.setState({
-      questions: [...this.state.questions, content]
     });
   };
 
   render() {
     const { step } = this.state;
     const { total, difficulty, questions } = this.state;
-    const values = { total, difficulty, questions };
+    const values = { difficulty, questions, total };
 
     let component = null;
     switch(step) {

@@ -1,14 +1,15 @@
 import { Component } from 'react';
 import io from 'socket.io-client';
 
+
 let socket;
+const baseURL = 'http://34.200.215.19:5000/';
 
 class Header extends Component {
   constructor() {
     super();
     this.state = {
-      endpoint: 'https://quizy-server.herokuapp.com/'
-      // endpoint: 'http://localhost:3000'
+      endpoint: baseURL
     };
   socket = io(this.state.endpoint);
   }
@@ -18,4 +19,4 @@ class Header extends Component {
   }
 }
 
-export { Header, socket };
+export { Header, socket, baseURL };

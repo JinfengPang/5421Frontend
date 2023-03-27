@@ -8,12 +8,20 @@ export default class AllQuizzes extends Component {
   constructor() {
     super();
     this.state = {
-      quizzes: [{
-        _id: 1,
-        difficulty: 'easy',
-        total: 10,
-        questions: [{}, {}, {}]
-      }]
+      quizzes: [
+          {
+            _id: 1,
+            difficulty: 'easy',
+            total: 10,
+            questions: [{}, {}, {}]
+          },
+        {
+          _id: 2,
+          difficulty: 'difficult',
+          total: 10,
+          questions: [{}, {}, {}]
+        }
+      ]
     }
   }
 
