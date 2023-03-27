@@ -51,15 +51,6 @@ export default class Register extends Component {
   }
 
   render() {
-    let error;
-
-    // if (this.state.message === null) {
-    //   error = null
-    // } else if (this.state.message === "Not correct") {
-    //   error = <div className={ styles.error }><div>Password is not matched</div>Please check and try again.</div>
-    // } else if (this.state.message === "username taken") {
-    //   error = <div className={ styles.error }>Sorry, that username is taken.</div>
-    // }
 
     return (
       <div className={ styles.home }>
@@ -104,12 +95,13 @@ export default class Register extends Component {
               Login
             </Button>
           </div>
-
-          <div style={{ minHeight: "6rem", margin: "1rem 0" }}>
-            { error }
-          </div>
           <div style={{ textAlign: "center" }}>
-          <p className={ styles.hostQuiz }>Do not have an account yet?</p><p className={ styles.hostQuiz }><Link to="/register" style={{ color: "white", textDecoration: "none", fontWeight: "bold" }}>Register</Link> a new account</p>
+
+          <p className={ styles.hostQuiz }>Do not have an account yet?</p>
+          <p className={ styles.hostQuiz }>
+              <Link to="/register" style={{ color: "white", textDecoration: "none", fontWeight: "bold" }}>Register</Link>
+              a new account
+          </p>
           </div>
         </Grid>
       </div>
