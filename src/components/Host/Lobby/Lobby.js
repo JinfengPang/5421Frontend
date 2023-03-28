@@ -9,11 +9,14 @@ import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 
 export default class Lobby extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    const searchParams = new URLSearchParams(props.location.search);
+    const quizId = searchParams.get('quizId');
+    const roomId = searchParams.get('roomId');
     this.state = {
-      quizId: null,
-      pin: null,
+      quizId: quizId,
+      pin: roomId,
       players: null,
       playersCount: null,
       disabled: true,
@@ -22,21 +25,6 @@ export default class Lobby extends Component {
   }
 
   componentDidMount() {
-    const queryString = require('query-string');
-    const parsed = queryString.parse(this.props.location.search);
-    const quizId = parsed.quizId;
-    this.setState({
-      quizId: quizId
-    })
-
-    socket.emit("HOST_JOINED", quizId);
-
-    socket.on("SHOW_PIN", data => {
-      this.setState({
-        pin: data.pin
-      })
-    })
-
     socket.on("UPDATE_PLAYERS_IN_LOBBY", playersData => {
       if (playersData.playersCount === 0) {
         this.setState({
@@ -148,7 +136,7 @@ export default class Lobby extends Component {
               xs={4}
               style={{ textAlign: "right", paddingRight: "50px" }}
             >
-              <Link to={`/start?quizId=${ this.state.quizId }&pin=${ this.state.pin }`}>
+              <Link to={`/gameblock?quizId=${ this.state.quizId }&pin=${ this.state.pin }`}>
                 <Button variant="contained" color="primary" className={ styles.startBtn } onClick={ this.startGame } disabled={ this.state.disabled } style={{ fontSize: "1.6rem" }}>
                   Start
                 </Button>
@@ -162,7 +150,6 @@ export default class Lobby extends Component {
             <Players players={ this.state.players } playersCount={ this.state.playersCount }/>
           </Grid>
           <Grid>
-
           </Grid>
         </Grid>
       </div>
@@ -188,3 +175,5 @@ const Players = (props) => {
     </div>
   )
 }
+
+
