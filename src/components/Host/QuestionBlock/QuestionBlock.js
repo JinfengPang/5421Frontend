@@ -3,12 +3,12 @@ import Footer from '../Footer/Footer';
 import styles from './QuestionBlock.module.scss';
 import { socket } from '../../Global/Header';
 import Grid from '@material-ui/core/Grid';
-import { Box } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import GradeIcon from '@material-ui/icons/Grade';
 import FiberManualRecordRoundedIcon from '@material-ui/icons/FiberManualRecordRounded';
 import Brightness3SharpIcon from '@material-ui/icons/Brightness3Sharp';
-
+import { Layout } from '@douyinfe/semi-ui';
+const { Sider, Content } = Layout;
 export default class QuestionBlock extends Component {
   constructor() {
     super();
@@ -25,12 +25,12 @@ export default class QuestionBlock extends Component {
       time: this.state.time - 1
     })
 
-    if (this.state.time <= 0 ) {
-      clearInterval(this.state.intervalId);
-      const pin = this.props.pin;
-      socket.emit("QUESTION_END", pin);
-      this.props.nextStep();
-    }
+    // if (this.state.time <= 0 ) {
+    //   clearInterval(this.state.intervalId);
+    //   const pin = this.props.pin;
+    //   socket.emit("QUESTION_END", pin);
+    //   this.props.nextStep();
+    // }
   }
 
   componentDidMount() {
@@ -102,27 +102,23 @@ export default class QuestionBlock extends Component {
           style={{ minHeight: "40vh" }}
           className={ styles.controls }
         >
-          <Box display="flex">
-            <Box p={1} className={ styles.time } flex="initial" marginRight={5}>
-              { this.state.time }
-            </Box>
-            <Box p={1} flex="1" marginRight={4}
-                 style={{
-                   "font-size": "2.4rem",
-                   "font-weight": 800
-            }}>{ question }</Box>
-            <Box p={1} flex="initial" className={ styles.right }>
-              <div className={ styles.answersCounter }>
-                <div className={ styles.count }>{ this.state.playersAnswered || 0 }</div>
-                <div className={ styles.answer }>
-                  { name }
-                </div>
+          <Layout >
+            <Sider className={styles.time}>{this.state.time}</Sider>
+            <Content>
+              <div style={{
+                padding: "2rem", fontSize: '2.4rem', "overflow-wrap": "anywhere",
+                fontWeight: 600, textAlign: "center" }}>
+                {question}
               </div>
-            </Box>
 
-
-          </Box>
-
+            </Content>
+            <Sider className={styles.right}>
+              <div className={styles.answersCounter}>
+                <div className={styles.count}>{this.state.playersAnswered || 0}</div>
+                <div className={styles.answer}>{name}</div>
+              </div>
+            </Sider>
+          </Layout>
         </Grid>
         <Grid
           item

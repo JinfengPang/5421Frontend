@@ -17,7 +17,7 @@ export default class Gameblock extends Component {
       questionNumber: 1,
       totalNumberOfQuestions: null,
       questionStatus: true,
-      question: "abcd",
+      question: "\"Given a database schema [\\'B\\', \\'F\\', \\'W\\', \\'V\\'] and functional dependencies: {W, B, V} -> {W, B}, {V, B, F} -> {F, B, W}, {B, V} -> {F, W}, {F, B} -> {W, F}, what are the candidate keys of this relational schema\"},",
       answers: ['A', 'B', 'C', 'D'],
       answeredA: 0,
       answeredB: 0,
