@@ -1,13 +1,18 @@
 import axios from 'axios';
 
-const QuizInfo = {
+export const QuizInfo = {
   getQuiz(id) {
-    return axios.get(`http://34.200.215.19:5000/api/quiz/get_quiz?quiz_id=${id}`)
+    return axios.get(URL(`quiz/get_quiz?quiz_id=${id}`))
   },
 
   getAllQuizzes() {
-    return axios.get('http://34.200.215.19:5000/api/quiz/get_all_quizzes')
+    return axios
+        .get(URL(`quiz/get_all_quiz?user_id=${localStorage.getItem("userId")}`)
+    )
   }
 }
 
-export default QuizInfo;
+
+export let URL = (model) => {
+  return `http://127.0.0.1:5000/api/${ model }`
+};

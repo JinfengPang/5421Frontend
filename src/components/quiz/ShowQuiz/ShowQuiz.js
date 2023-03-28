@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import styles from './ShowQuiz.module.scss';
-import QuizInfo from '../../utils';
+import { QuizInfo } from '../../utils';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
 import {Form} from '@douyinfe/semi-ui';
-
-let URL = (model) => {
-    return `http://34.200.215.19:5000/api/${ model }/`
-};
 
 export default class ShowQuiz extends Component {
   constructor() {
@@ -24,8 +20,11 @@ export default class ShowQuiz extends Component {
 
   componentDidMount() {
     const { quizId } = this.props.match.params;
-    QuizInfo.getQuiz( quizId ).then(( { data } ) => {
-      const { difficulty, questions } = data;
+    QuizInfo.getQuiz( quizId ).then(response => {
+      let response_data = response.data.data
+      let difficulty = response_data.quiz_type,
+          questions = JSON.parse(response_data.questions)
+        console.log(questions)
       this.setState({
         id: quizId,
         difficulty: difficulty,
@@ -138,7 +137,18 @@ const PreviewQuestions = (props) => {
   const questions = props.questions.map((q, i) => (
     <div key={ i }>
       <div style={{ fontWeight: "bold" }}>Question { i + 1 }</div>
-      <p>{ q.question }</p>
+      <p>{ q.description }</p>
+        <ul style={{"list-style-type": "none"}}>
+            Choices
+            {
+                q.choices.map((element, index) => {
+                    if (index === q.answer) {
+                        return <li style={{"color": "green"}}>{element.toString()}</li>
+                    }
+                    return <li style={{"color": "red"}}>{element.toString()}</li>
+                })
+            }
+        </ul>
     </div>
   ))
 

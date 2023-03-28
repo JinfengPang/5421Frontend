@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './Lobby.module.scss';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import { socket } from '../../Global/Header';

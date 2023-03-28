@@ -2,36 +2,22 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './AllQuizzes.module.scss';
 import Grid from '@material-ui/core/Grid';
-import QuizInfo from '../../utils';
+import { QuizInfo } from '../../utils';
 
 export default class AllQuizzes extends Component {
   constructor() {
     super();
     this.state = {
-      quizzes: [
-          {
-            id: 1,
-            difficulty: 'easy',
-            total: 10,
-            questions: [{}, {}, {}]
-          },
-        {
-          id: 2,
-          difficulty: 'difficult',
-          total: 10,
-          questions: [{}, {}, {}]
-        }
-      ]
+      quizzes: []
     }
   }
 
   componentDidMount() {
-    QuizInfo.getAllQuizzes().then(({ data }) => {
+    QuizInfo.getAllQuizzes().then(response => {
       this.setState({
-        quizzes: data
+        quizzes: response.data.data.questions
       })
     })
-
   }
 
   render() {
@@ -97,11 +83,10 @@ const Index = (props) => {
   }
 
   const publicQuizzes = props.quizzes.map((q) => (
-    <Link to={`/quizzes/${ q.id }`}>
+    <Link to={`/quizzes/${ q.quiz_id }`}>
       <div className={ styles.tile } key={ q.id }>
-        <div>{ q.difficulty }</div>
-        <div>{ q.total }</div>
-        <div>{ q.questions.length } questions</div>
+        <div>{ q.quiz_type }</div>
+        <div>{ q.quiz_count } questions</div>
       </div>
     </Link>
   ))

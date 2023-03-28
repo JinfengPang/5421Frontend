@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import styles from './JoinGame.module.scss';
 import { MuiThemeProvider, createMuiTheme, withStyles  } from '@material-ui/core/styles';
 import InputBase from '@material-ui/core/InputBase';
@@ -112,7 +112,9 @@ export default class JoinGame extends Component {
   }
 
   render() {
-
+    if (!localStorage.getItem("userId")) {
+      return <Redirect to="/login"/>
+    }
     let error;
 
     if (this.state.message === null) {

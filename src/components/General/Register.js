@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import { Form } from "@douyinfe/semi-ui";
 import Button from '@material-ui/core/Button';
 import axios from "axios";
+import { URL } from "../utils";
 const { ErrorMessage } = Form;
 
 const style = {
@@ -19,10 +20,6 @@ const style = {
     width: '250px',
 }
 
-let URL = (model) => {
-    return `http://34.200.215.19:5000/api/${ model }/`
-};
-
 export default class Register extends Component {
     constructor() {
         super();
@@ -33,13 +30,16 @@ export default class Register extends Component {
     handleSubmit = event => {
         event.preventDefault();
         let postRequest = {...this.formApi.getValues()}
-        axios
-            .post(URL('user/sign_in'), postRequest)
+
+        axios.post(URL("user/sign_up"), postRequest)
             .then((response) => {
-                this.props.history.push(`/sign_in`)
+                let userId = response.data.data.user_id
+                localStorage.setItem("userId", userId)
+                this.props.history.push(`/`)
             })
             .catch((err) => {
-                this.formApi.setError("username", "username exists")
+                let err_msg = err.response.data.error
+                this.formApi.setError("password", err_msg)
             })
     };
 
@@ -48,7 +48,6 @@ export default class Register extends Component {
     }
 
     render() {
-
         return (
             <div className={ styles.home }>
                 <Grid
