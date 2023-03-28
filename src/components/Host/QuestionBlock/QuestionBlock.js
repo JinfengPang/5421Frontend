@@ -3,6 +3,7 @@ import Footer from '../Footer/Footer';
 import styles from './QuestionBlock.module.scss';
 import { socket } from '../../Global/Header';
 import Grid from '@material-ui/core/Grid';
+import { Box } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import GradeIcon from '@material-ui/icons/Grade';
 import FiberManualRecordRoundedIcon from '@material-ui/icons/FiberManualRecordRounded';
@@ -12,6 +13,7 @@ export default class QuestionBlock extends Component {
   constructor() {
     super();
     this.state = {
+      questionId: 1,
       time: 20,
       playersAnswered: 0,
       intervalId: ''
@@ -89,7 +91,7 @@ export default class QuestionBlock extends Component {
           style={{ minHeight: "20vh" }}
           className={ styles.question }
         >
-          <h1>{ question }</h1>
+          <h1>Question {this.state.questionId}</h1>
         </Grid>
         <Grid
           item
@@ -100,15 +102,27 @@ export default class QuestionBlock extends Component {
           style={{ minHeight: "40vh" }}
           className={ styles.controls }
         >
-          <div className={ styles.time }>{ this.state.time }</div>
-          <div className={ styles.right }>
-            <div className={ styles.answersCounter }>
-              <div className={ styles.count }>{ this.state.playersAnswered || 0 }</div>
-              <div className={ styles.answer }>
-                { name }
+          <Box display="flex">
+            <Box p={1} className={ styles.time } flex="initial" marginRight={5}>
+              { this.state.time }
+            </Box>
+            <Box p={1} flex="1" marginRight={4}
+                 style={{
+                   "font-size": "2.4rem",
+                   "font-weight": 800
+            }}>{ question }</Box>
+            <Box p={1} flex="initial" className={ styles.right }>
+              <div className={ styles.answersCounter }>
+                <div className={ styles.count }>{ this.state.playersAnswered || 0 }</div>
+                <div className={ styles.answer }>
+                  { name }
+                </div>
               </div>
-            </div>
-          </div>
+            </Box>
+
+
+          </Box>
+
         </Grid>
         <Grid
           item
