@@ -68,8 +68,9 @@ export default class Gameblock extends Component {
     socket.on("RECEIVE_NUMBER_OF_QUESTIONS", data => {
       const { gameId, totalNumberOfQuestions } = data;
       this.setState({
-        gameId: gameId,
+        gameId: gameId, // removed
         totalNumberOfQuestions: totalNumberOfQuestions
+        // 需要time limit
       })
     })
 
@@ -96,8 +97,8 @@ export default class Gameblock extends Component {
       this.setState({
         score: score,
         rank: rank,
-        streak: streak,
-        lastCorrect: lastCorrect,
+        streak: streak, // 删除
+        lastCorrect: lastCorrect, // 删除
         step: step + 1
       })
     });
