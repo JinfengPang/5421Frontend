@@ -2,13 +2,11 @@ import React from 'react';
 import AllQuizzes from './quiz/AllQuizzes/AllQuizzes';
 import ShowQuiz from './quiz/ShowQuiz/ShowQuiz';
 import Lobby from './Host/Lobby/Lobby';
-import Start from './Host/Start/Start';
 import Gameblock from './Host/Gameblock/Gameblock';
 import JoinGame from './Player/JoinGame/JoinGame';
 import QuizForm from './quiz/NewQuiz/QuizForm/QuizForm';
 import Playblock from './Player/Playblock/Playblock';
 import Instructions from './Player/Instructions/Instructions';
-import GetReady from './Player/GetReady/GetReady';
 import { Header } from './Global/Header';
 import { HashRouter, Switch, Route } from 'react-router-dom';
 import Login from './General/Login';
@@ -24,9 +22,7 @@ function App() {
           <Route exact path='/login' component={ Login }/>
           <Route exact path='/' component={ JoinGame }/>
           <Route exact path='/instructions' component={ Instructions }/>
-          <Route exact path='/getready' component={ GetReady }/>
-          <Route exact path='/lobby' component={ Lobby }/>
-          <Route exact path='/start' component={ Start }/>
+          <Route exact path='/lobby/' component={ Lobby }/>
           <Route exact path='/gameblock' component={ Gameblock }/>
           <Route exact path='/playblock' component={ Playblock }/>
           <Route exact path='/quizzes' component={ AllQuizzes }/>

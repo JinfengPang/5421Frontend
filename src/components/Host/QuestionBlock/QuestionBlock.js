@@ -7,11 +7,13 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import GradeIcon from '@material-ui/icons/Grade';
 import FiberManualRecordRoundedIcon from '@material-ui/icons/FiberManualRecordRounded';
 import Brightness3SharpIcon from '@material-ui/icons/Brightness3Sharp';
-
+import { Layout } from '@douyinfe/semi-ui';
+const { Sider, Content } = Layout;
 export default class QuestionBlock extends Component {
   constructor() {
     super();
     this.state = {
+      questionId: 1,
       time: 20,
       playersAnswered: 0,
       intervalId: ''
@@ -23,12 +25,12 @@ export default class QuestionBlock extends Component {
       time: this.state.time - 1
     })
 
-    if (this.state.time <= 0 ) {
-      clearInterval(this.state.intervalId);
-      const pin = this.props.pin;
-      socket.emit("QUESTION_END", pin);
-      this.props.nextStep();
-    }
+    // if (this.state.time <= 0 ) {
+    //   clearInterval(this.state.intervalId);
+    //   const pin = this.props.pin;
+    //   socket.emit("QUESTION_END", pin);
+    //   this.props.nextStep();
+    // }
   }
 
   componentDidMount() {
@@ -89,7 +91,7 @@ export default class QuestionBlock extends Component {
           style={{ minHeight: "20vh" }}
           className={ styles.question }
         >
-          <h1>{ question }</h1>
+          <h1>Question {this.state.questionId}</h1>
         </Grid>
         <Grid
           item
@@ -100,15 +102,23 @@ export default class QuestionBlock extends Component {
           style={{ minHeight: "40vh" }}
           className={ styles.controls }
         >
-          <div className={ styles.time }>{ this.state.time }</div>
-          <div className={ styles.right }>
-            <div className={ styles.answersCounter }>
-              <div className={ styles.count }>{ this.state.playersAnswered || 0 }</div>
-              <div className={ styles.answer }>
-                { name }
+          <Layout >
+            <Sider className={styles.time}>{this.state.time}</Sider>
+            <Content>
+              <div style={{
+                padding: "2rem", fontSize: '2.4rem', "overflow-wrap": "anywhere",
+                fontWeight: 600, textAlign: "center" }}>
+                {question}
               </div>
-            </div>
-          </div>
+
+            </Content>
+            <Sider className={styles.right}>
+              <div className={styles.answersCounter}>
+                <div className={styles.count}>{this.state.playersAnswered || 0}</div>
+                <div className={styles.answer}>{name}</div>
+              </div>
+            </Sider>
+          </Layout>
         </Grid>
         <Grid
           item

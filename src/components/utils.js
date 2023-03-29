@@ -1,13 +1,18 @@
 import axios from 'axios';
 
-const QuizInfo = {
+export const QuizInfo = {
   getQuiz(id) {
-    return axios.get(`https://quizy-server.herokuapp.com/quizzes/${ id }`)
+    return axios.get(URL(`quiz/get_quiz?quiz_id=${id}`))
   },
 
   getAllQuizzes() {
-    return axios.get('https://quizy-server.herokuapp.com/quizzes')
+    return axios
+        .get(URL(`quiz/get_all_quiz?user_id=${localStorage.getItem("userId")}`)
+    )
   }
 }
 
-export default QuizInfo;
+
+export let URL = (model) => {
+  return `http://127.0.0.1:5000/api/${ model }`
+};

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { socket } from '../../Global/Header';
-import QuestionBlockIntro from '../QuestionBlockIntro/QuestionBlockIntro';
 import QuestionBlock from '../QuestionBlock/QuestionBlock';
 import ResultBlock from '../ResultBlock/ResultBlock';
 import Scoreboard from '../Scoreboard/Scoreboard';
@@ -13,13 +12,13 @@ export default class Gameblock extends Component {
       step: 1,
       gameId: null,
       quizId: null,
-      quizName: null,
+      quizName: "quizName",
       pin: null,
       questionNumber: 1,
       totalNumberOfQuestions: null,
       questionStatus: true,
-      question: null,
-      answers: [],
+      question: "\"Given a database schema [\\'B\\', \\'F\\', \\'W\\', \\'V\\'] and functional dependencies: {W, B, V} -> {W, B}, {V, B, F} -> {F, B, W}, {B, V} -> {F, W}, {F, B} -> {W, F}, what are the candidate keys of this relational schema\"},",
+      answers: ['A', 'B', 'C', 'D'],
       answeredA: 0,
       answeredB: 0,
       answeredC: 0,
@@ -138,15 +137,6 @@ export default class Gameblock extends Component {
     let component = null;
     switch(step) {
       case 1:
-        component = <QuestionBlockIntro
-          nextStep={ this.nextStep }
-          handleChange={ this.handleChange }
-          questionNumber={ questionNumber }
-          question={ question }
-          totalNumberOfQuestions={ totalNumberOfQuestions }
-        />
-        break;
-      case 2:
         component = <QuestionBlock
           nextStep={ this.nextStep }
           pin={ pin }
@@ -155,7 +145,7 @@ export default class Gameblock extends Component {
           playersAnswered={ playersAnswered }
         />
         break;
-      case 3:
+      case 2:
         component = <ResultBlock
           answers={ answers }
           answeredA={ answeredA }

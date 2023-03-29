@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import styles from './ShowQuiz.module.scss';
-import QuizInfo from '../../utils';
+import { QuizInfo } from '../../utils';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
 import {Form} from '@douyinfe/semi-ui';
-
-let URL = (model) => {
-    return `http://34.200.215.19:5000/api/${ model }/`
-};
+import { URL } from '../../utils';
 
 export default class ShowQuiz extends Component {
   constructor() {
@@ -24,12 +21,15 @@ export default class ShowQuiz extends Component {
 
   componentDidMount() {
     const { quizId } = this.props.match.params;
-    QuizInfo.getQuiz( quizId ).then(( { data } ) => {
-      const { _id, difficulty, total, questions } = data;
+    QuizInfo.getQuiz( quizId ).then(response => {
+      let response_data = response.data.data
+      let difficulty = response_data.quiz_type,
+          questions = JSON.parse(response_data.questions)
+        console.log(questions)
       this.setState({
-        id: _id,
+        id: quizId,
         difficulty: difficulty,
-        total: total,
+        total: questions.length,
         questions: questions
       })
     });
@@ -39,13 +39,14 @@ export default class ShowQuiz extends Component {
     event.preventDefault()
     let postRequest = {
       ...this.formApi.getValues(),
+      host_id: localStorage.getItem("userId"),
       quiz_id: this.state.id,
     }
     axios
-        .post(URL('create_room'), postRequest)
+        .post(URL('room/create_room'), postRequest)
         .then((response) => {
-          let room_id = response.data.room_id;
-          this.props.history.push(`/lobby?quizId=${ this.state.id }&&roomId=${ room_id }`)
+          let room_id = response.data.data.room_id;
+          this.props.history.push(`/lobby/?quizId=${ this.state.id }&roomId=${ room_id }`)
         })
         .catch((err) => {
           console.log(err);
@@ -109,7 +110,6 @@ export default class ShowQuiz extends Component {
                         ]}
             />
           </Form>
-          <PreviewQuestions questions={ this.state.questions } />
           <Button
               style={{
                 fontSize: "1.6rem",
@@ -124,6 +124,7 @@ export default class ShowQuiz extends Component {
             >
             Host Game
           </Button>
+          <PreviewQuestions questions={ this.state.questions } />
         </Grid>
       </Grid>
     );
@@ -138,7 +139,18 @@ const PreviewQuestions = (props) => {
   const questions = props.questions.map((q, i) => (
     <div key={ i }>
       <div style={{ fontWeight: "bold" }}>Question { i + 1 }</div>
-      <p>{ q.question }</p>
+      <p>{ q.description }</p>
+        <ul style={{"list-style-type": "none"}}>
+            Choices
+            {
+                q.choices.map((element, index) => {
+                    if (index === q.answer) {
+                        return <li style={{"color": "green"}}>{element.toString()}</li>
+                    }
+                    return <li style={{"color": "red"}}>{element.toString()}</li>
+                })
+            }
+        </ul>
     </div>
   ))
 

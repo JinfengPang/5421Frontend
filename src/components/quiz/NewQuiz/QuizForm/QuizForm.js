@@ -4,10 +4,8 @@ import axios from 'axios';
 import QuizDetailsForm from '../QuizDetailsForm/QuizDetailsForm';
 import Confirm from '../Confirm/Confirm';
 import Grid from '@material-ui/core/Grid';
-
-let URL = (model) => {
-  return `http://34.200.215.19:5000/api/${ model }/`
-};
+import {Redirect} from "react-router-dom";
+import { URL } from "../../../utils";
 
 export default class QuizForm extends Component {
   constructor() {
@@ -37,11 +35,12 @@ export default class QuizForm extends Component {
   saveQuiz = async () => {
     const { difficulty, total } = this.state;
     const postRequest = {
-      difficulty: difficulty,
-      total: total
+      quiz_type: difficulty,
+      quiz_count: total,
+      user_id: localStorage.getItem("userId")
     }
-    let res = await axios.post(URL('create-quiz'), postRequest);
-    const quizId = res.data._id;
+    let res = await axios.post(URL('quiz/generate_quiz'), postRequest);
+    let quizId = res.data.data.quiz_id
     this.props.history.push(`/quizzes/${ quizId }`);
   }
 
@@ -58,6 +57,10 @@ export default class QuizForm extends Component {
   };
 
   render() {
+    if (!localStorage.getItem("userId")) {
+      return <Redirect to="/login"/>
+    }
+
     const { step } = this.state;
     const { total, difficulty, questions } = this.state;
     const values = { difficulty, questions, total };
