@@ -21,7 +21,7 @@ export default function Gameover(props) {
         style={{ minHeight: "15vh"}}
         className={ styles.title }
       >
-        <div className={ styles.name }>{ props.quizName }</div>
+        <div className={ styles.name }>Final Rank</div>
       </Grid>
       <FinalRankings rankings={ props.finalRankings } totalNumberOfQuestions={ props.totalNumberOfQuestions } />
       <Grid

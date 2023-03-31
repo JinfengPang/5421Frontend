@@ -12,20 +12,18 @@ export default class Gameblock extends Component {
       step: 1,
       gameId: null,
       quizId: null,
-      quizName: "quizName",
       pin: null,
       questionNumber: 1,
       totalNumberOfQuestions: null,
-      questionStatus: true,
       question: "\"Given a database schema [\\'B\\', \\'F\\', \\'W\\', \\'V\\'] and functional dependencies: {W, B, V} -> {W, B}, {V, B, F} -> {F, B, W}, {B, V} -> {F, W}, {F, B} -> {W, F}, what are the candidate keys of this relational schema\"},",
       answers: ['A', 'B', 'C', 'D'],
-      answeredA: 0,
-      answeredB: 0,
-      answeredC: 0,
-      answeredD: 0,
-      correctAnswer: null,
+      answeredA: 2,
+      answeredB: 3,
+      answeredC: 4,
+      answeredD: 5,
+      correctAnswer: 'a',
       gameStatus: true,
-      rankedPlayers: []
+      rankedPlayers: [{nickname: 'a', score: 100}, {nickname: 'b', score: 200}, {nickname: 'c', score: 300}]
     };
   }
 
@@ -58,7 +56,7 @@ export default class Gameblock extends Component {
 
   endGame = () => {
     this.setState({
-      step: 5
+      step: 4
     })
     const pin = this.state.pin;
     socket.emit("FINISH_GAME", pin);
@@ -79,14 +77,12 @@ export default class Gameblock extends Component {
       pin: pin,
       quizId: quizId
     })
+    socket.emit("GO_TO_NEXT_QUESTION", this.state.pin);
 
-    socket.emit("FETCH_FIRST_QUESTION", pin);
-
-    socket.on("RECEIVE_FIRST_QUESTION", data => {
-      const { gameId, quizName, question, totalNumberOfQuestions } = data;
+    socket.on("RECEIVE_QUESTION", data => {
+      const { gameId, question, totalNumberOfQuestions } = data;
       this.setState({
         gameId: gameId,
-        quizName: quizName,
         question: question.question,
         answers: question.answers,
         correctAnswer: question.correct,
@@ -94,34 +90,17 @@ export default class Gameblock extends Component {
       })
     })
 
-    socket.on("QUESTION_RESULT", data => {
-      const { answeredA, answeredB, answeredC, answeredD, correctAnswer } = data;
+    socket.on("RECEIVE_SCOREBOARD", data => {
+      const { answeredA, answeredB, answeredC, answeredD, rankedPlayers } = data;
       this.setState({
         answeredA: answeredA,
         answeredB: answeredB,
         answeredC: answeredC,
         answeredD: answeredD,
-        correctAnswer: correctAnswer,
-        step: 3
+        rankedPlayers: rankedPlayers,
+        step: 2
       });
     });
-
-    socket.on("RECEIVE_SCOREBOARD", rankedPlayers => {
-      this.setState({
-        rankedPlayers: rankedPlayers
-      })
-    })
-
-    socket.on("NEXT_QUESTION", data => {
-      const { questionNumber, question } = data;
-      this.setState({
-        questionNumber: questionNumber,
-        question: question.question,
-        answers: question.answers,
-        correctAnswer: question.correct,
-      })
-    });
-
     socket.on("GAME_OVER", data => {
       this.setState({
         gameStatus: false,
@@ -132,7 +111,7 @@ export default class Gameblock extends Component {
 
   render() {
     const { step } = this.state;
-    const { quizName, pin, questionNumber, totalNumberOfQuestions, question, answers, answeredA, answeredB, answeredC, answeredD, correctAnswer, playersAnswered, rankedPlayers, gameStatus } = this.state;
+    const { pin, questionNumber, totalNumberOfQuestions, question, answers, answeredA, answeredB, answeredC, answeredD, correctAnswer, playersAnswered, rankedPlayers, gameStatus } = this.state;
 
     let component = null;
     switch(step) {
@@ -159,7 +138,7 @@ export default class Gameblock extends Component {
           fetchScoreboard={ this.fetchScoreboard }
         />
         break;
-      case 4:
+      case 3:
         component = <Scoreboard
           pin={ pin }
           rankedPlayers={ rankedPlayers }
@@ -167,12 +146,10 @@ export default class Gameblock extends Component {
           totalNumberOfQuestions={ totalNumberOfQuestions }
           nextQuestion={ this.nextQuestion }
           endGame={ this.endGame }
-          gameStatus={ gameStatus }
         />
         break;
-      case 5:
+      case 4:
         component = <Gameover
-          quizName={ quizName }
           totalNumberOfQuestions={ totalNumberOfQuestions }
           finalRankings={ rankedPlayers }
         />

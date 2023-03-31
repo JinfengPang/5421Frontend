@@ -1,9 +1,10 @@
 import { Component } from 'react';
 import io from 'socket.io-client';
+import {IP} from '../utils';
 
 
 let socket;
-const baseURL = 'http://34.200.215.19:5000/';
+const baseURL = `http://${IP}/`;
 
 class Header extends Component {
   constructor() {

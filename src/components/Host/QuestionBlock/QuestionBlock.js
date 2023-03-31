@@ -39,32 +39,19 @@ export default class QuestionBlock extends Component {
       intervalId: intervalId
     })
 
-    socket.on("UPDATE_PLAYERS_ANSWERED", playersAnswered => {
+    socket.on("RECEIVED_ANSWER", playersAnswered => {
       this.setState({
         playersAnswered: playersAnswered
       })
-    })
-
-    socket.on("FETCH_TIME", playerId => {
-
-      const data = {
-        pin: this.props.pin,
-        playerId: playerId,
-        time: this.state.time
-      }
-
-      socket.emit("SEND_TIME", data);
     })
   }
 
   componentWillUnmount() {
     socket.off("UPDATE_PLAYERS_ANSWERED");
-    socket.off("FETCH_TIME");
     clearInterval(this.state.intervalId);
   }
 
   render() {
-
     let name;
 
     if (this.state.playersAnswered === 1) {
