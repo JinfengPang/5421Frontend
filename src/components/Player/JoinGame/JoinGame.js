@@ -78,37 +78,55 @@ export default class JoinGame extends Component {
   handleSubmit = event => {
     event.preventDefault();
     const { nickname, pin } = this.state;
-    socket.emit("PLAYER_JOINED", {
+    axios.post('room/player_join_room', {
       nickname: nickname,
       pin: parseInt(pin)
-    });
+    })
+
+    // socket.emit("PLAYER_JOINED", {
+    //   nickname: nickname,
+    //   pin: parseInt(pin)
+    // });
   };
 
+  checkGameState = () => {
+    axios.post('room/game_state', {
+      room_id: this.state.pin
+    }).then(response => {
+      let state = response.data.data
+      this.setState({
+        step: state.step
+      })
+    })
+  }
+
   componentDidMount() {
-    socket.on("NICKNAME_TAKEN", () => {
-      this.setState({
-        message: "Nickname taken"
-      })
+    const serverTimer = setInterval(this.checkGameState, 500);
 
-      setTimeout(() => this.setState({
-        message: null
-      }), 3000);
-    })
+    // socket.on("NICKNAME_TAKEN", () => {
+    //   this.setState({
+    //     message: "Nickname taken"
+    //   })
 
-    socket.on("GAME_NOT_FOUND", () => {
-      this.setState({
-        message: "Not found"
-      })
+    //   setTimeout(() => this.setState({
+    //     message: null
+    //   }), 3000);
+    // })
 
-      setTimeout(() => this.setState({
-        message: null
-      }), 3000);
+    // socket.on("GAME_NOT_FOUND", () => {
+    //   this.setState({
+    //     message: "Not found"
+    //   })
 
-    });
+    //   setTimeout(() => this.setState({
+    //     message: null
+    //   }), 3000);
 
-    socket.on("PLAYER_JOINED_SUCCESSFULLY", data => {
-      this.props.history.push(`/instructions?nickname=${ this.state.nickname }&pin=${ this.state.pin }`)
-    })
+    // });
+
+    // socket.on("PLAYER_JOINED_SUCCESSFULLY", data => {
+    //   this.props.history.push(`/instructions?nickname=${ this.state.nickname }&pin=${ this.state.pin }`)
+    // })
   }
 
   render() {

@@ -43,99 +43,34 @@ export default class Gameblock extends Component {
       answer: letter,
       gameId: this.state.gameId
     }
+    axios.post('room/player_ans', {
+      answer: letter,
+    })
+    // socket.emit("ANSWER_SUBMITTED", data);
+  }
 
-    socket.emit("ANSWER_SUBMITTED", data);
+
+  checkGameState = () => {
+    axios.post('room/game_state', {
+      room_id: this.state.pin
+    }).then(response => {
+      let state = response.data.data
+      this.setState({
+        step: state.step
+      })
+    })
   }
 
   componentDidMount() {
     const queryString = require('query-string');
     const parsed = queryString.parse(this.props.location.search);
     const nickname = parsed.nickname;
+    const serverTimer = setInterval(this.checkGameState, 500);
+
     const pin = parseInt(parsed.pin);
     this.setState({
       nickname: nickname,
       pin: pin
-    })
-
-    socket.on("HOST_DISCONNECTED", () => {
-      this.setState({
-        hostDisconnected: true
-      })
-    })
-
-    socket.emit("FETCH_NUMBER_OF_QUESTIONS", pin)
-
-    socket.on("RECEIVE_NUMBER_OF_QUESTIONS", data => {
-      const { gameId, totalNumberOfQuestions } = data;
-      this.setState({
-        gameId: gameId, // removed
-        totalNumberOfQuestions: totalNumberOfQuestions
-        // 需要time limit
-      })
-    })
-
-    socket.on("RECEIVE_ANSWER_OPTIONS", data => {
-      this.setState({
-        questionNumber: data.questionNumber,
-        answers: data.answers
-      })
-    })
-
-    socket.on("QUESTION_RESULT", data => {
-      const { nickname, gameId } = this.state;
-      const info = {
-        nickname: nickname,
-        gameId: gameId
-      }
-
-      socket.emit("FETCH_SCORE", info);
-    })
-
-    socket.on("PLAYER_RESULTS", data => {
-      const { step } = this.state;
-      const { score, rank, streak, lastCorrect } = data;
-      this.setState({
-        score: score,
-        rank: rank,
-        streak: streak, // 删除
-        lastCorrect: lastCorrect, // 删除
-        step: step + 1
-      })
-    });
-
-    socket.on("RECEIVE_NEXT_ANSWER_OPTIONS", data => {
-      const { questionNumber, totalNumberOfQuestions, answers } = data;
-      this.setState({
-        questionNumber: questionNumber,
-        totalNumberOfQuestions: totalNumberOfQuestions,
-        answers: answers
-      })
-    })
-
-    socket.on("GO_TO_NEXT_QUESTION", () => {
-      this.setState({
-        step: 1
-      })
-    })
-
-    socket.on("GAME_OVER", () => {
-      const gameId = this.state.gameId;
-      socket.emit("PLAYER_RANK", gameId);
-    })
-
-    socket.on("FINAL_RANK", data => {
-      const { score, totalCorrect, rank } = data;
-      this.setState({
-        score: score,
-        totalCorrect: totalCorrect,
-        rank: rank
-      })
-    })
-
-    socket.on("FINAL_VIEW", () => {
-      this.setState({
-        step: 4
-      })
     })
   }
 
