@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import Footer from '../Footer/Footer';
 import styles from './QuestionBlock.module.scss';
-import { socket } from '../../Global/Header';
+// import { socket } from '../../Global/Header';
 import Grid from '@material-ui/core/Grid';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import GradeIcon from '@material-ui/icons/Grade';
 import FiberManualRecordRoundedIcon from '@material-ui/icons/FiberManualRecordRounded';
 import Brightness3SharpIcon from '@material-ui/icons/Brightness3Sharp';
 import { Layout } from '@douyinfe/semi-ui';
+import axios from "axios";
+import {URL} from "../../utils";
 const { Sider, Content } = Layout;
 export default class QuestionBlock extends Component {
   constructor() {
@@ -16,7 +18,8 @@ export default class QuestionBlock extends Component {
       questionId: 1,
       time: 20,
       playersAnswered: 0,
-      intervalId: ''
+      intervalId: null,
+      serverTimer: null
     }
   }
 
@@ -25,30 +28,36 @@ export default class QuestionBlock extends Component {
       time: this.state.time - 1
     })
 
-    // if (this.state.time <= 0 ) {
-    //   clearInterval(this.state.intervalId);
-    //   const pin = this.props.pin;
-    //   socket.emit("QUESTION_END", pin);
-    //   this.props.nextStep();
-    // }
+    if (this.state.time <= 0 ) {
+      clearInterval(this.state.intervalId);
+      clearInterval(this.state.serverTimer)
+      this.props.nextStep();
+    }
   }
 
-  componentDidMount() {
-    const intervalId = setInterval(this.timer, 1000);
-    this.setState({
-      intervalId: intervalId
-    })
-
-    socket.on("RECEIVED_ANSWER", playersAnswered => {
+  timerCallback = () => {
+    axios.get(URL('get_total_answers'), {
+      room_id: this.props.pin
+    }).then(response => {
+      let data = response.data.data
       this.setState({
-        playersAnswered: playersAnswered
+        playersAnswered: data.playersAnswered,
       })
     })
   }
 
+  componentDidMount() {
+    const intervalId = setInterval(this.timer, 1000);
+    const serverTimer = setInterval(this.timerCallback, 300);
+    this.setState({
+      intervalId: intervalId,
+      serverTimer: serverTimer
+    })
+  }
+
   componentWillUnmount() {
-    socket.off("UPDATE_PLAYERS_ANSWERED");
     clearInterval(this.state.intervalId);
+    clearInterval(this.state.serverTimer)
   }
 
   render() {

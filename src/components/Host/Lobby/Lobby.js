@@ -3,10 +3,12 @@ import styles from './Lobby.module.scss';
 import {Link} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import { socket } from '../../Global/Header';
+import axios from 'axios';
+import { URL } from '../../utils';
 import theme from '../Music/theme.mp3';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
+
 
 export default class Lobby extends Component {
   constructor(props) {
@@ -19,22 +21,27 @@ export default class Lobby extends Component {
       pin: roomId,
       players: null,
       playersCount: null,
-      muted: false
+      muted: false,
+      timer: null
     };
   }
 
-  componentDidMount() {
-    socket.emit("CREATE_ROOM", {
-      user_id: localStorage.getItem("user_id"),
-      room_id: this.state.pin,
-      isHost: 1
+  timerCallback = () => {
+    axios.get(URL('get_players'), {
+      room_id: this.pin
+    }).then(response => {
+      let data = response.data.data
+      this.setState({
+        players: data.players,
+        playersCount: data.length
+      })
     })
+  }
 
-    socket.on("PLAYER_JOINED_SUCCESSFULLY", playersData => {
-        this.setState({
-          players: [...this.state.players, playersData.user_name],
-          playersCount: this.state.playersCount + 1
-        })
+  componentDidMount() {
+    const timer = setInterval(this.timerCallback, 1000)
+    this.setState({
+      timer: timer
     })
   }
 
@@ -46,7 +53,7 @@ export default class Lobby extends Component {
   }
 
   componentWillUnmount() {
-    socket.off("PLAYER_JOINED_SUCCESSFULLY");
+    clearInterval(this.state.timer)
   }
 
   render() {
@@ -128,7 +135,7 @@ export default class Lobby extends Component {
               xs={4}
               style={{ textAlign: "right", paddingRight: "50px" }}
             >
-              <Link to={`/gameblock?quizId=${ this.state.quizId }&pin=${ this.state.pin }`}>
+              <Link to={`/gameblock?quizId=${ this.state.quizId }`}>
                 <Button variant="contained" color="primary" className={ styles.startBtn } onClick={ this.startGame } style={{ fontSize: "1.6rem" }}>
                   Start
                 </Button>

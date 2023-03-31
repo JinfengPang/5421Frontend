@@ -10,7 +10,7 @@ export default class Gameblock extends Component {
   constructor() {
     super();
     this.state = {
-      step: 3,
+      step: 2,
       gameId: null,
       nickname: null,
       pin: null,
