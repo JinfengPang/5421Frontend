@@ -10,9 +10,10 @@ class Header extends Component {
   constructor() {
     super();
     this.state = {
-      endpoint: baseURL
+      endpoint: 'http://127.0.0.1:5000'
     };
   socket = io(this.state.endpoint);
+  console.log(socket.connected)
   }
 
   render() {

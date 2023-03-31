@@ -22,10 +22,10 @@ export default class ShowQuiz extends Component {
   componentDidMount() {
     const { quizId } = this.props.match.params;
     QuizInfo.getQuiz( quizId ).then(response => {
+        console.log(response)
       let response_data = response.data.data
       let difficulty = response_data.quiz_type,
           questions = JSON.parse(response_data.questions)
-        console.log(questions)
       this.setState({
         id: quizId,
         difficulty: difficulty,

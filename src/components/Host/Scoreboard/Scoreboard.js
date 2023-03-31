@@ -6,22 +6,7 @@ import Button from '@material-ui/core/Button';
 import { socket } from '../../Global/Header';
 
 export default class Scoreboard extends Component {
-
-  finishGame = () => {
-    this.props.endGame();
-  }
-
-  handleClick = () => {
-    this.props.nextQuestion();
-    const data = {
-      pin: this.props.pin,
-      questionNumber: this.props.questionNumber + 1
-    }
-    socket.emit("FETCH_NEXT_QUESTION", data);
-  }
-
   render () {
-
     let body;
     if (this.props.rankedPlayers.length === 0) {
       body = <div className={ styles.loading }>Loading scoreboard</div>
@@ -33,9 +18,9 @@ export default class Scoreboard extends Component {
 
     let button;
     if (questionNumber !== totalNumberOfQuestions) {
-      button = <Button variant="contained" color="primary" onClick={ this.handleClick } className={ styles.nextBtn }>Next</Button>
+      button = <Button variant="contained" color="primary" onClick={ this.props.nextQuestion } className={ styles.nextBtn }>Next</Button>
     } else {
-      button = <Button variant="contained" color="primary" onClick={ this.finishGame } className={ styles.nextBtn }>End</Button>
+      button = <Button variant="contained" color="primary" onClick={ this.props.endGame } className={ styles.nextBtn }>End</Button>
     }
 
     return (

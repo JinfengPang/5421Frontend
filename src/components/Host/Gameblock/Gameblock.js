@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { socket } from '../../Global/Header';
+import axios  from "axios";
 import QuestionBlock from '../QuestionBlock/QuestionBlock';
 import ResultBlock from '../ResultBlock/ResultBlock';
 import Scoreboard from '../Scoreboard/Scoreboard';
@@ -9,38 +9,44 @@ export default class Gameblock extends Component {
   constructor() {
     super();
     this.state = {
-      step: 1,
-      gameId: null,
-      quizId: null,
+      step: 3,
       pin: null,
       questionNumber: 1,
       totalNumberOfQuestions: null,
-      question: "\"Given a database schema [\\'B\\', \\'F\\', \\'W\\', \\'V\\'] and functional dependencies: {W, B, V} -> {W, B}, {V, B, F} -> {F, B, W}, {B, V} -> {F, W}, {F, B} -> {W, F}, what are the candidate keys of this relational schema\"},",
-      answers: ['A', 'B', 'C', 'D'],
-      answeredA: 2,
-      answeredB: 3,
-      answeredC: 4,
-      answeredD: 5,
-      correctAnswer: 'a',
-      gameStatus: true,
-      rankedPlayers: [{nickname: 'a', score: 100}, {nickname: 'b', score: 200}, {nickname: 'c', score: 300}]
+      question: null,
+      answers: [],
+      answeredA: 0,
+      answeredB: 0,
+      answeredC: 0,
+      answeredD: 0,
+      correctAnswer: '',
+      rankedPlayers: []
     };
   }
 
   nextStep = () => {
-    const { step, questionNumber, totalNumberOfQuestions } = this.state;
+    const { step } = this.state;
     this.setState({
       step: step + 1
     });
-
-    if (questionNumber === totalNumberOfQuestions) {
-      this.setState({
-        gameStatus: false
-      })
-    }
   }
 
   nextQuestion = () => {
+    if (this.state.questionNumber + 1 === this.state.totalNumberOfQuestions) {
+      this.endGame()
+      return
+    }
+
+    axios.post('room/next_question', {
+      room_id: this.state.pin
+    }).then(response => {
+      let state = response.data.data
+      this.setState({
+        question: state.question,
+        answers: state.answers,
+      })
+    })
+
     this.setState({
       step: 1,
       rankedPlayers: [],
@@ -50,68 +56,57 @@ export default class Gameblock extends Component {
       answeredD: 0,
       correctAnswer: null
     })
-    const { pin } = this.state;
-    socket.emit("PROCEED_TO_NEXT_QUESTION", pin);
   }
 
   endGame = () => {
     this.setState({
       step: 4
     })
-    const pin = this.state.pin;
-    socket.emit("FINISH_GAME", pin);
   }
 
   fetchScoreboard = () => {
-    const { gameId } = this.state;
-    socket.emit("FETCH_SCOREBOARD", gameId);
-    console.log('Host requesting for scoreboard.');
+    axios.post('room/scoreboard', {
+      room_id: this.state.pin
+    }).then(response => {
+      let state = response.data.data
+      this.setState({
+        answeredA: state.answeredA,
+        answeredB: state.answeredB,
+        answeredC: state.answeredC,
+        answeredD: state.answeredD,
+        rankedPlayers: state.rankedPlayers
+      })
+    })
+  }
+
+  checkGameState = () => {
+    axios.post('room/game_state', {
+      room_id: this.state.pin
+    }).then(response => {
+      let state = response.data.data
+      this.setState({
+        step: state.step
+      })
+    })
   }
 
   componentDidMount() {
-    const queryString = require('query-string');
-    const parsed = queryString.parse(this.props.location.search);
-    const quizId = parsed.quizId;
-    const pin = parseInt(parsed.pin);
+    const { quizId, totalNumberOfQuestions } = this.props.match.params;
+    const serverTimer = setInterval(this.checkGameState, 500);
     this.setState({
-      pin: pin,
-      quizId: quizId
+      serverTimer: serverTimer,
+      pin: quizId,
+      totalNumberOfQuestions: totalNumberOfQuestions
     })
-    socket.emit("GO_TO_NEXT_QUESTION", this.state.pin);
+  }
 
-    socket.on("RECEIVE_QUESTION", data => {
-      const { gameId, question, totalNumberOfQuestions } = data;
-      this.setState({
-        gameId: gameId,
-        question: question.question,
-        answers: question.answers,
-        correctAnswer: question.correct,
-        totalNumberOfQuestions: totalNumberOfQuestions
-      })
-    })
-
-    socket.on("RECEIVE_SCOREBOARD", data => {
-      const { answeredA, answeredB, answeredC, answeredD, rankedPlayers } = data;
-      this.setState({
-        answeredA: answeredA,
-        answeredB: answeredB,
-        answeredC: answeredC,
-        answeredD: answeredD,
-        rankedPlayers: rankedPlayers,
-        step: 2
-      });
-    });
-    socket.on("GAME_OVER", data => {
-      this.setState({
-        gameStatus: false,
-        rankedPlayers: data
-      })
-    })
+  componentWillUnmount() {
+    clearInterval(this.state.serverTimer)
   }
 
   render() {
     const { step } = this.state;
-    const { pin, questionNumber, totalNumberOfQuestions, question, answers, answeredA, answeredB, answeredC, answeredD, correctAnswer, playersAnswered, rankedPlayers, gameStatus } = this.state;
+    const { pin, questionNumber, totalNumberOfQuestions, question, answers, answeredA, answeredB, answeredC, answeredD, correctAnswer, playersAnswered, rankedPlayers } = this.state;
 
     let component = null;
     switch(step) {

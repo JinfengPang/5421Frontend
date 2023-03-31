@@ -23,7 +23,7 @@ function App() {
           <Route exact path='/' component={ JoinGame }/>
           <Route exact path='/instructions' component={ Instructions }/>
           <Route exact path='/lobby/' component={ Lobby }/>
-          <Route exact path='/gameblock' component={ Gameblock }/>
+          <Route exact path='/gameblock/:quizId/:totalQuestions' component={ Gameblock }/>
           <Route exact path='/playblock' component={ Playblock }/>
           <Route exact path='/quizzes' component={ AllQuizzes }/>
           <Route exact path='/quizzes/new' component={ QuizForm }/>
