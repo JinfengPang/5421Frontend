@@ -19,25 +19,22 @@ export default class Lobby extends Component {
       pin: roomId,
       players: null,
       playersCount: null,
-      disabled: true,
       muted: false
     };
   }
 
   componentDidMount() {
-    socket.on("UPDATE_PLAYERS_IN_LOBBY", playersData => {
-      if (playersData.playersCount === 0) {
+    socket.emit("CREATE_ROOM", {
+      user_id: localStorage.getItem("user_id"),
+      room_id: this.state.pin,
+      isHost: 1
+    })
+
+    socket.on("PLAYER_JOINED_SUCCESSFULLY", playersData => {
         this.setState({
-          players: null,
-          playersCount: null
+          players: [...this.state.players, playersData.user_name],
+          playersCount: this.state.playersCount + 1
         })
-      } else {
-        this.setState({
-          players: playersData.players,
-          playersCount: playersData.playersCount,
-          disabled: false
-        })
-      }
     })
   }
 
@@ -48,13 +45,8 @@ export default class Lobby extends Component {
     })
   }
 
-  startGame = () => {
-    socket.emit("HOST_STARTED_GAME", this.state.pin);
-  }
-
   componentWillUnmount() {
-    socket.off("SHOW_PIN");
-    socket.off("UPDATE_PLAYERS_IN_LOBBY");
+    socket.off("PLAYER_JOINED_SUCCESSFULLY");
   }
 
   render() {
@@ -137,7 +129,7 @@ export default class Lobby extends Component {
               style={{ textAlign: "right", paddingRight: "50px" }}
             >
               <Link to={`/gameblock?quizId=${ this.state.quizId }&pin=${ this.state.pin }`}>
-                <Button variant="contained" color="primary" className={ styles.startBtn } onClick={ this.startGame } disabled={ this.state.disabled } style={{ fontSize: "1.6rem" }}>
+                <Button variant="contained" color="primary" className={ styles.startBtn } onClick={ this.startGame } style={{ fontSize: "1.6rem" }}>
                   Start
                 </Button>
               </Link>
