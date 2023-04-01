@@ -1,37 +1,24 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import { socket } from '../../Global/Header';
-import Preview from '../Preview/Preview';
 import Answer from '../Answer/Answer';
 import Result from '../Result/Result';
 import Ranking from '../Ranking/Ranking';
+import axios from 'axios';
+import {URL} from '../../utils';
 
 export default class Gameblock extends Component {
   constructor() {
     super();
     this.state = {
-      step: 2,
-      gameId: null,
-      nickname: null,
-      pin: null,
+      step: 1,
+      pin: localStorage.getItem("pin"),
+      nickname: localStorage.getItem("nickname"),
       answer: null,
       score: 0,
-      streak: 0,
       rank: 0,
       lastCorrect: false,
       totalCorrect: 0,
       questionNumber: 1,
-      totalNumberOfQuestions: null,
-      answers: [],
-      hostDisconnected: false
     };
-  }
-
-  nextStep = () => {
-    const { step } = this.state;
-    this.setState({
-      step: step + 1
-    });
   }
 
   submitAnswer = letter => {
@@ -39,19 +26,25 @@ export default class Gameblock extends Component {
       answer: letter
     })
 
-    const data = {
+    axios.post(URL('room/player_ans'), {
       answer: letter,
-      gameId: this.state.gameId
-    }
-    axios.post('room/player_ans', {
-      answer: letter,
+      nickname: this.state.nickname,
+      room_id: this.state.pin
+    }).then(response => {
+      this.setState({
+        lastCorrect: response.data.data.is_correct
+      })
     })
-    // socket.emit("ANSWER_SUBMITTED", data);
+
+    const serverTimer = setInterval(this.checkGameState, 500)
+    this.setState({
+      serverTimer: serverTimer
+    })
   }
 
 
   checkGameState = () => {
-    axios.post('room/game_state', {
+    axios.post(URL('room/game_state'), {
       room_id: this.state.pin
     }).then(response => {
       let state = response.data.data
@@ -61,57 +54,28 @@ export default class Gameblock extends Component {
     })
   }
 
-  componentDidMount() {
-    const queryString = require('query-string');
-    const parsed = queryString.parse(this.props.location.search);
-    const nickname = parsed.nickname;
-    const serverTimer = setInterval(this.checkGameState, 500);
-
-    const pin = parseInt(parsed.pin);
-    this.setState({
-      nickname: nickname,
-      pin: pin
-    })
-  }
-
   render() {
     const { step } = this.state;
-    const { pin, nickname, score, streak, lastCorrect, questionNumber, totalNumberOfQuestions, answers, rank } = this.state;
+    const { pin, nickname, score, lastCorrect, questionNumber, rank } = this.state;
 
     let component = null;
     switch(step) {
       case 1:
-        component = <Preview
-          nextStep={ this.nextStep }
-          pin={ pin }
-          nickname={ nickname }
-          questionNumber={ questionNumber }
-          totalNumberOfQuestions={ totalNumberOfQuestions }
+        component = <Answer
+          submitAnswer={ this.submitAnswer }
         />;
         break;
       case 2:
-        component = <Answer
-          submitAnswer={ this.submitAnswer }
-          pin={ pin }
-          nickname={ nickname }
-          questionNumber={ questionNumber }
-          totalNumberOfQuestions={ totalNumberOfQuestions }
-          answers={ answers }
-        />;
-        break;
-      case 3:
         component = <Result
           pin={ pin }
           questionNumber={ questionNumber }
-          totalNumberOfQuestions={ totalNumberOfQuestions }
           nickname={ nickname }
           lastCorrect={ lastCorrect }
-          streak={ streak }
           rank={ rank }
           score={ score }
         />;
         break;
-      case 4:
+      case 3:
         component = <Ranking
           nickname={ nickname }
           rank={ rank }
@@ -124,11 +88,6 @@ export default class Gameblock extends Component {
     return (
       <div>
         { component }
-        {
-          this.state.hostDisconnected ?
-          <Redirect to='/' />
-          : null
-        }
       </div>
     )
   }

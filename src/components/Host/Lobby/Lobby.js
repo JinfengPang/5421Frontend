@@ -16,24 +16,26 @@ export default class Lobby extends Component {
     const searchParams = new URLSearchParams(props.location.search);
     const quizId = searchParams.get('quizId');
     const roomId = searchParams.get('roomId');
+    const totalAnswers = searchParams.get('totalAnswers');
     this.state = {
       quizId: quizId,
       pin: roomId,
       players: null,
       playersCount: null,
       muted: false,
-      timer: null
+      timer: null,
+      totalAnswers: totalAnswers
     };
   }
 
   timerCallback = () => {
-    axios.get(URL('get_players'), {
-      room_id: this.pin
+    axios.post(URL('room/get_players'), {
+      room_id: this.state.pin
     }).then(response => {
       let data = response.data.data
       this.setState({
         players: data.players,
-        playersCount: data.length
+        playersCount: data.players_count
       })
     })
   }
@@ -135,8 +137,8 @@ export default class Lobby extends Component {
               xs={4}
               style={{ textAlign: "right", paddingRight: "50px" }}
             >
-              <Link to={`/gameblock?quizId=${ this.state.quizId }`}>
-                <Button variant="contained" color="primary" className={ styles.startBtn } onClick={ this.startGame } style={{ fontSize: "1.6rem" }}>
+              <Link to={`/gameblock/?quiz_id=${ this.state.quizId }&room_id=${this.state.pin}&total_answers=${this.state.totalAnswers}`}>
+                <Button variant="contained" color="primary" className={ styles.startBtn } style={{ fontSize: "1.6rem" }}>
                   Start
                 </Button>
               </Link>
@@ -163,8 +165,8 @@ const Players = (props) => {
   }
 
   const playerNames = props.players.map((p, i) => (
-    <div key={ p._id }>
-      { p.nickname }
+    <div key={ i }>
+      { p }
     </div>
   ))
 

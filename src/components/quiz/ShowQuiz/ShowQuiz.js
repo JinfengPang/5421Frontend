@@ -4,7 +4,6 @@ import { QuizInfo } from '../../utils';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
-import {Form} from '@douyinfe/semi-ui';
 import { URL } from '../../utils';
 
 export default class ShowQuiz extends Component {
@@ -22,7 +21,6 @@ export default class ShowQuiz extends Component {
   componentDidMount() {
     const { quizId } = this.props.match.params;
     QuizInfo.getQuiz( quizId ).then(response => {
-        console.log(response)
       let response_data = response.data.data
       let difficulty = response_data.quiz_type,
           questions = JSON.parse(response_data.questions)
@@ -38,7 +36,8 @@ export default class ShowQuiz extends Component {
   hostGame(event) {
     event.preventDefault()
     let postRequest = {
-      ...this.formApi.getValues(),
+      room_size: 100,
+      time_limit: 100,
       host_id: localStorage.getItem("userId"),
       quiz_id: this.state.id,
     }
@@ -46,7 +45,7 @@ export default class ShowQuiz extends Component {
         .post(URL('room/create_room'), postRequest)
         .then((response) => {
           let room_id = response.data.data.room_id;
-          this.props.history.push(`/lobby/?quizId=${ this.state.id }&roomId=${ room_id }`)
+          this.props.history.push(`/lobby/?quizId=${ this.state.id }&roomId=${ room_id }&totalAnswers=${this.state.total}`)
         })
         .catch((err) => {
           console.log(err);
@@ -92,24 +91,6 @@ export default class ShowQuiz extends Component {
           <h2>QUIZ PREVIEW</h2>
           <h3>Difficulty: { this.state.difficulty }</h3 >
           <h3>Total Questions: { this.state.total }</h3 >
-          <Form layout='vertical'
-                getFormApi={this.getFormApi}
-          >
-            <Form.Input field='room_size' label='Room Size'
-                        style={{ width: '250px' }}
-                        rules={[
-                          { required: true, message: 'Must set the room size' },
-                          { validator: (rule, value) => !isNaN(value), message: 'must be integer' }
-                        ]}
-            />
-            <Form.Input field='time_limit' label='Time Limit (seconds)'
-                        style={{ width: '250px' }}
-                        rules={[
-                          { required: true, message: 'Must set the time limit' },
-                          { validator: (rule, value) => !isNaN(value), message: 'must be integer' }
-                        ]}
-            />
-          </Form>
           <Button
               style={{
                 fontSize: "1.6rem",

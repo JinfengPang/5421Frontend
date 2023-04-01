@@ -13,7 +13,10 @@ export default class ResultBlock extends Component {
 
   handleClick = () => {
     this.props.nextStep();
-    this.props.fetchScoreboard();
+  }
+
+  componentDidMount() {
+    this.props.fetchScoreboard()
   }
 
   render() {
@@ -40,16 +43,16 @@ export default class ResultBlock extends Component {
     let cTick = '';
     let dTick = '';
 
-    if (correctAnswer === 'a') {
+    if (correctAnswer === 'A') {
       aOpacity = 1;
       aTick =  <CheckIcon />;
-    } else if (correctAnswer === 'b') {
+    } else if (correctAnswer === 'B') {
       bOpacity = 1;
       bTick = <CheckIcon />;
-    } else if (correctAnswer === 'c') {
+    } else if (correctAnswer === 'C') {
       cOpacity = 1;
       cTick = <CheckIcon />;
-    } else if (correctAnswer === 'd') {
+    } else if (correctAnswer === 'D') {
       dOpacity = 1;
       dTick = <CheckIcon />;
     }

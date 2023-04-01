@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import StatusBar from '../StatusBar/StatusBar';
 import styles from './Answer.module.scss';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -24,10 +23,18 @@ export default class Answer extends Component {
     })
   }
 
+  componentWillUnmount() {
+    clearInterval(this.state.timer)
+  }
+
+  componentDidMount() {
+    const timer = setTimeout(this.props.submitAnswer, 20000, null)
+    this.setState({
+      timer: timer
+    })
+  }
+
   render() {
-
-    const { pin, nickname, questionNumber, totalNumberOfQuestions } = this.props;
-
     let body;
 
     if (!this.state.buttonsOn) {
@@ -57,7 +64,7 @@ export default class Answer extends Component {
           item
           xs={6}
         >
-          <Button variant="contained" className={ styles.red } value="a" onClick={ this.handleClick } fullWidth>
+          <Button variant="contained" className={ styles.red } value="A" onClick={ this.handleClick } fullWidth>
             <FavoriteIcon className={ styles.icons } />
           </Button>
         </Grid>
@@ -65,7 +72,7 @@ export default class Answer extends Component {
           item
           xs={6}
         >
-          <Button variant="contained" className={ styles.blue } value="b" onClick={ this.handleClick } fullWidth>
+          <Button variant="contained" className={ styles.blue } value="B" onClick={ this.handleClick } fullWidth>
             <GradeIcon className={ styles.icons }  />
           </Button>
         </Grid>
@@ -73,7 +80,7 @@ export default class Answer extends Component {
           item
           xs={6}
         >
-          <Button variant="contained" className={ styles.orange } value="c" onClick={ this.handleClick } fullWidth>
+          <Button variant="contained" className={ styles.orange } value="C" onClick={ this.handleClick } fullWidth>
             <FiberManualRecordRoundedIcon className={ styles.icons } />
           </Button>
         </Grid>
@@ -81,7 +88,7 @@ export default class Answer extends Component {
           item
           xs={6}
         >
-          <Button variant="contained" className={ styles.green } value="d" onClick={ this.handleClick } fullWidth>
+          <Button variant="contained" className={ styles.green } value="D" onClick={ this.handleClick } fullWidth>
             <Brightness3SharpIcon className={ styles.icons } />
           </Button>
         </Grid>
@@ -95,12 +102,6 @@ export default class Answer extends Component {
         alignItems="center"
         style={{ minHeight: '100vh' }}
       >
-        <StatusBar
-          pin={ pin }
-          questionNumber={ questionNumber }
-          totalNumberOfQuestions={ totalNumberOfQuestions }
-          nickname={ nickname }
-        />
        { body }
       </Grid>
     )

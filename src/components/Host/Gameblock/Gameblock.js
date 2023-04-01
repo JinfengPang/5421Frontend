@@ -4,15 +4,21 @@ import QuestionBlock from '../QuestionBlock/QuestionBlock';
 import ResultBlock from '../ResultBlock/ResultBlock';
 import Scoreboard from '../Scoreboard/Scoreboard';
 import Gameover from '../Gameover/Gameover';
+import {URL} from "../../utils";
 
 export default class Gameblock extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    const searchParams = new URLSearchParams(props.location.search);
+    const quizId = searchParams.get('quiz_id');
+    const roomId = searchParams.get('room_id');
+    const totalAnswers = searchParams.get('total_answers');
     this.state = {
-      step: 3,
-      pin: null,
-      questionNumber: 1,
-      totalNumberOfQuestions: null,
+      step: 4,
+      quizId: quizId,
+      pin: roomId,
+      questionNumber: 0,
+      totalNumberOfQuestions: totalAnswers,
       question: null,
       answers: [],
       answeredA: 0,
@@ -32,18 +38,21 @@ export default class Gameblock extends Component {
   }
 
   nextQuestion = () => {
-    if (this.state.questionNumber + 1 === this.state.totalNumberOfQuestions) {
-      this.endGame()
+    if (this.state.questionNumber >= parseInt(this.state.totalNumberOfQuestions)) {
+      this.setState({
+        step: 4
+      })
       return
     }
 
-    axios.post('room/next_question', {
+    axios.post(URL('room/next_question'), {
       room_id: this.state.pin
     }).then(response => {
       let state = response.data.data
       this.setState({
-        question: state.question,
-        answers: state.answers,
+        question: state.description,
+        answers: state.choices,
+        questionNumber: this.state.questionNumber + 1
       })
     })
 
@@ -59,31 +68,34 @@ export default class Gameblock extends Component {
   }
 
   endGame = () => {
-    this.setState({
-      step: 4
-    })
+    this.props.history.push("/")
   }
 
   fetchScoreboard = () => {
-    axios.post('room/scoreboard', {
+    axios.post(URL('room/scoreboard'), {
       room_id: this.state.pin
     }).then(response => {
       let state = response.data.data
       this.setState({
-        answeredA: state.answeredA,
-        answeredB: state.answeredB,
-        answeredC: state.answeredC,
-        answeredD: state.answeredD,
-        rankedPlayers: state.rankedPlayers
+        correctAnswer: state.correct_ans,
+        answeredA: state.answers_count[0],
+        answeredB: state.answers_count[1],
+        answeredC: state.answers_count[2],
+        answeredD: state.answers_count[3],
+        rankedPlayers: state.ranked_players
       })
     })
   }
 
   checkGameState = () => {
-    axios.post('room/game_state', {
+    axios.post(URL('room/game_state'), {
       room_id: this.state.pin
     }).then(response => {
       let state = response.data.data
+      if (this.state.step >= 2) {
+        return
+      }
+
       this.setState({
         step: state.step
       })
@@ -91,13 +103,11 @@ export default class Gameblock extends Component {
   }
 
   componentDidMount() {
-    const { quizId, totalNumberOfQuestions } = this.props.match.params;
-    const serverTimer = setInterval(this.checkGameState, 500);
+    const serverTimer = setInterval(this.checkGameState, 5000);
     this.setState({
       serverTimer: serverTimer,
-      pin: quizId,
-      totalNumberOfQuestions: totalNumberOfQuestions
     })
+    this.nextQuestion()
   }
 
   componentWillUnmount() {
@@ -114,6 +124,7 @@ export default class Gameblock extends Component {
         component = <QuestionBlock
           nextStep={ this.nextStep }
           pin={ pin }
+          questioinId = { questionNumber }
           question={ question }
           answers={ answers }
           playersAnswered={ playersAnswered }
@@ -146,6 +157,7 @@ export default class Gameblock extends Component {
       case 4:
         component = <Gameover
           totalNumberOfQuestions={ totalNumberOfQuestions }
+          endGame = {this.endGame}
           finalRankings={ rankedPlayers }
         />
         break;

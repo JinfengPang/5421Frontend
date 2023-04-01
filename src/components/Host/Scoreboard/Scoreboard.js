@@ -3,12 +3,11 @@ import Footer from '../Footer/Footer';
 import Grid from '@material-ui/core/Grid';
 import styles from './Scoreboard.module.scss';
 import Button from '@material-ui/core/Button';
-import { socket } from '../../Global/Header';
 
 export default class Scoreboard extends Component {
   render () {
     let body;
-    if (this.props.rankedPlayers.length === 0) {
+    if (!this.props.rankedPlayers) {
       body = <div className={ styles.loading }>Loading scoreboard</div>
     } else {
       body = <Rankings playerRanks={ this.props.rankedPlayers } />

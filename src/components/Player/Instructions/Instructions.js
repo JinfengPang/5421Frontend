@@ -1,52 +1,46 @@
 import React, { Component } from 'react';
-import StatusBar from '../StatusBar/StatusBar';
 import { Redirect } from 'react-router-dom';
-import { socket } from '../../Global/Header';
 import styles from './Instructions.module.scss';
 import Grid from '@material-ui/core/Grid';
+import axios from "axios";
+import {URL} from "../../utils";
 
 export default class Instructions extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    const searchParams = new URLSearchParams(props.location.search);
+    const pin = searchParams.get('room_id');
     this.state = {
-      nickname: null,
-      pin: null,
-      redirect: false,
-      hostDisconnected: false
+      pin: pin
     };
   }
 
-  componentDidMount() {
-    const queryString = require('query-string');
-    const parsed = queryString.parse(this.props.location.search);
-    const nickname = parsed.nickname;
-    const pin = parseInt(parsed.pin);
-    this.setState({
-      nickname: nickname,
-      pin: pin
+  checkGameState = () => {
+    axios.post(URL('room/game_state'), {
+      room_id: this.state.pin
+    }).then(response => {
+      let state = response.data.data
+      this.setState({
+        step: state.step
+      })
     })
+  }
 
-    socket.on("GAME_HAS_STARTED", () => {
-      this.setState({
-        redirect: true
-      })
-   })
-
-    socket.on("HOST_DISCONNECTED", () => {
-      this.setState({
-        hostDisconnected: true
-      })
+  componentDidMount() {
+    const serverTimer = setInterval(this.checkGameState, 500);
+    this.setState({
+      serverTimer: serverTimer,
     })
   }
 
   componentWillUnmount() {
-    socket.off("GAME_HAS_STARTED");
-    socket.off("HOST_DISCONNECTED");
+    clearInterval(this.state.serverTimer)
   }
 
   render() {
-
-    const { pin, nickname } = this.state;
+    if (this.state.step === 1) {
+      return <Redirect to="/playblock"></Redirect>
+    }
 
     return (
       <Grid
@@ -55,10 +49,6 @@ export default class Instructions extends Component {
         alignItems="center"
         style={{ minHeight: '100vh' }}
       >
-        <StatusBar
-          pin={ pin }
-          nickname={ nickname }
-        />
         <Grid
           item
           container
@@ -85,16 +75,6 @@ export default class Instructions extends Component {
             See your nickname on screen?
           </Grid>
         </Grid>
-        {
-          this.state.redirect ?
-          <Redirect to={`/getready?nickname=${ this.state.nickname }&pin=${ this.state.pin }`} />
-          : null
-        }
-        {
-          this.state.hostDisconnected ?
-          <Redirect to='/' />
-          : null
-        }
       </Grid>
     )
   }

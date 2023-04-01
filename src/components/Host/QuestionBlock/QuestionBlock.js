@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Footer from '../Footer/Footer';
 import styles from './QuestionBlock.module.scss';
-// import { socket } from '../../Global/Header';
 import Grid from '@material-ui/core/Grid';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import GradeIcon from '@material-ui/icons/Grade';
@@ -11,11 +10,12 @@ import { Layout } from '@douyinfe/semi-ui';
 import axios from "axios";
 import {URL} from "../../utils";
 const { Sider, Content } = Layout;
+
 export default class QuestionBlock extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      questionId: 1,
+      questionId: props.questionId,
       time: 20,
       playersAnswered: 0,
       intervalId: null,
@@ -36,19 +36,19 @@ export default class QuestionBlock extends Component {
   }
 
   timerCallback = () => {
-    axios.get(URL('get_total_answers'), {
+    axios.post(URL('room/get_total_answers'), {
       room_id: this.props.pin
     }).then(response => {
       let data = response.data.data
       this.setState({
-        playersAnswered: data.playersAnswered,
+        playersAnswered: data.players_answered,
       })
     })
   }
 
   componentDidMount() {
     const intervalId = setInterval(this.timer, 1000);
-    const serverTimer = setInterval(this.timerCallback, 300);
+    const serverTimer = setInterval(this.timerCallback, 3000);
     this.setState({
       intervalId: intervalId,
       serverTimer: serverTimer
@@ -70,6 +70,10 @@ export default class QuestionBlock extends Component {
     }
 
     const { pin, question, answers } = this.props;
+
+    if (!question) {
+      return <div>Question Loading...</div>
+    }
 
     return (
       <Grid
@@ -132,7 +136,7 @@ export default class QuestionBlock extends Component {
             xs={6}
             className={ styles.red }
           >
-            <FavoriteIcon className={ styles.icons }/>{ answers.a }
+            <FavoriteIcon className={ styles.icons }/>{ answers[0].toString() }
           </Grid>
           <Grid
             item
@@ -141,7 +145,7 @@ export default class QuestionBlock extends Component {
             xs={6}
             className={ styles.blue }
           >
-            <GradeIcon className={ styles.icons }/>{ answers.b }
+            <GradeIcon className={ styles.icons }/>{ answers[1].toString() }
           </Grid>
           <Grid
             item
@@ -150,7 +154,7 @@ export default class QuestionBlock extends Component {
             xs={6}
             className={ styles.orange }
           >
-            <FiberManualRecordRoundedIcon className={ styles.icons }/>{ answers.c }
+            <FiberManualRecordRoundedIcon className={ styles.icons }/>{ answers[2].toString() }
           </Grid>
           <Grid
             item
@@ -159,7 +163,7 @@ export default class QuestionBlock extends Component {
             xs={6}
             className={ styles.green }
           >
-            <Brightness3SharpIcon className={ styles.icons }/>{ answers.d }
+            <Brightness3SharpIcon className={ styles.icons }/>{ answers[3].toString() }
           </Grid>
         </Grid>
         <Footer pin={ pin }/>

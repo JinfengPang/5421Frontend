@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './Gameover.module.scss';
 import Grid from '@material-ui/core/Grid';
+import Button from "@material-ui/core/Button";
 
 export default function Gameover(props) {
 
@@ -23,6 +24,19 @@ export default function Gameover(props) {
       >
         <div className={ styles.name }>Final Rank</div>
       </Grid>
+      <Grid
+          item
+          container
+          xs={12}
+          justify="flex-end"
+          alignItems="center"
+          style={{ minHeight: "10vh"}}
+          className={ styles.title }
+      >
+        <Button onClick={props.endGame}>
+          <div className={ styles.sub }>Back to Lobby</div>
+        </Button>
+      </Grid>
       <FinalRankings rankings={ props.finalRankings } totalNumberOfQuestions={ props.totalNumberOfQuestions } />
       <Grid
         item
@@ -38,6 +52,9 @@ export default function Gameover(props) {
 }
 
 const FinalRankings = (props) => {
+  if (props.rankings.length === 0) {
+    return (<div>Ranking is loading...</div>)
+  }
 
   const [first, second, third] = props.rankings;
 

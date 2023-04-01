@@ -7,7 +7,6 @@ import JoinGame from './Player/JoinGame/JoinGame';
 import QuizForm from './quiz/NewQuiz/QuizForm/QuizForm';
 import Playblock from './Player/Playblock/Playblock';
 import Instructions from './Player/Instructions/Instructions';
-import { Header } from './Global/Header';
 import { HashRouter, Switch, Route } from 'react-router-dom';
 import Login from './General/Login';
 import Register from './General/Register';
@@ -15,7 +14,6 @@ import Register from './General/Register';
 function App() {
   return (
     <div className="app">
-      <Header />
       <HashRouter>
         <Switch>
           <Route exact path='/register' component={ Register }/>
@@ -23,7 +21,7 @@ function App() {
           <Route exact path='/' component={ JoinGame }/>
           <Route exact path='/instructions' component={ Instructions }/>
           <Route exact path='/lobby/' component={ Lobby }/>
-          <Route exact path='/gameblock/:quizId/:totalQuestions' component={ Gameblock }/>
+          <Route exact path='/gameblock/' component={ Gameblock }/>
           <Route exact path='/playblock' component={ Playblock }/>
           <Route exact path='/quizzes' component={ AllQuizzes }/>
           <Route exact path='/quizzes/new' component={ QuizForm }/>

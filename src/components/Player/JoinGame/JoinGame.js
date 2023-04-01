@@ -6,7 +6,8 @@ import InputBase from '@material-ui/core/InputBase';
 import grey from '@material-ui/core/colors/grey';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { socket } from '../../Global/Header';
+import axios from 'axios';
+import {URL} from "../../utils";
 
 const darkGreyTheme = createMuiTheme({
   palette: {
@@ -73,61 +74,24 @@ export default class JoinGame extends Component {
     this.setState({
       [name]: value
     });
+    console.log(event.target)
   };
 
   handleSubmit = event => {
     event.preventDefault();
     const { nickname, pin } = this.state;
-    axios.post('room/player_join_room', {
+    console.log(this.state)
+    axios.post(URL('room/player_join_room'), {
       nickname: nickname,
-      pin: parseInt(pin)
-    })
-
-    // socket.emit("PLAYER_JOINED", {
-    //   nickname: nickname,
-    //   pin: parseInt(pin)
-    // });
+      room_id: pin
+    }).then((response) => {
+          localStorage.setItem("nickname", nickname);
+          localStorage.setItem("pin", pin);
+          this.props.history.push(`/instructions/?room_id=${pin}`)
+        }
+    )
   };
 
-  checkGameState = () => {
-    axios.post('room/game_state', {
-      room_id: this.state.pin
-    }).then(response => {
-      let state = response.data.data
-      this.setState({
-        step: state.step
-      })
-    })
-  }
-
-  componentDidMount() {
-    const serverTimer = setInterval(this.checkGameState, 500);
-
-    // socket.on("NICKNAME_TAKEN", () => {
-    //   this.setState({
-    //     message: "Nickname taken"
-    //   })
-
-    //   setTimeout(() => this.setState({
-    //     message: null
-    //   }), 3000);
-    // })
-
-    // socket.on("GAME_NOT_FOUND", () => {
-    //   this.setState({
-    //     message: "Not found"
-    //   })
-
-    //   setTimeout(() => this.setState({
-    //     message: null
-    //   }), 3000);
-
-    // });
-
-    // socket.on("PLAYER_JOINED_SUCCESSFULLY", data => {
-    //   this.props.history.push(`/instructions?nickname=${ this.state.nickname }&pin=${ this.state.pin }`)
-    // })
-  }
 
   render() {
     if (!localStorage.getItem("userId")) {
