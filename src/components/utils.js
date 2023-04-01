@@ -12,7 +12,7 @@ export const QuizInfo = {
   }
 }
 
-export const IP = "127.0.0.1:5000";
+export const IP = "54.237.91.85:5000";
 
 export let URL = (model) => {
   return `http://${ IP }/api/${ model }`
